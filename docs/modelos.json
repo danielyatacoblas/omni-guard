@@ -28,11 +28,11 @@
     "video": "auto_estaciona.mp4",
     "res": 640,
     "dispositivo": "cuda",
-    "ms": 20.0,
-    "fps": 50.0,
+    "ms": 20.5,
+    "fps": 48.7,
     "dets": 1.4,
     "conf_media": 0.632,
-    "mejor_ms": 16.6,
+    "mejor_ms": 17.9,
     "fuente": [
       "Ultralytics · COCO 2017",
       "https://docs.ultralytics.com/models/yolo11/"
@@ -55,11 +55,11 @@
     "video": "peatones_arcos.mp4",
     "res": 640,
     "dispositivo": "cuda",
-    "ms": 25.4,
-    "fps": 39.4,
+    "ms": 26.3,
+    "fps": 38.0,
     "dets": 12.5,
     "conf_media": 0.706,
-    "mejor_ms": 21.4,
+    "mejor_ms": 21.0,
     "fuente": [
       "Detector de rostro de adetailer",
       null
