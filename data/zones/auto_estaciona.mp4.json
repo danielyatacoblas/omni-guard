@@ -1,0 +1,7 @@
+{
+  "video": "auto_estaciona.mp4",
+  "zones": [
+    {"id": "c1", "name": "Cochera 1", "type": "cochera", "color": "#E19100",
+     "points": [[0.33, 0.30], [0.72, 0.30], [0.72, 0.60], [0.33, 0.60]]}
+  ]
+}

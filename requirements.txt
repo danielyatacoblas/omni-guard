@@ -1,0 +1,9 @@
+# Este MVP comparte el Python global de los demás MVPs (torch CUDA ya instalado).
+# Referencia de lo que usa — normalmente NO hay nada que instalar:
+ultralytics>=8.3
+supervision>=0.29
+fastapi>=0.110
+uvicorn>=0.29
+opencv-python>=4.10
+numpy>=1.26
+python-dotenv>=1.0

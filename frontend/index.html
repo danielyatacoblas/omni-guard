@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OMNI Guard — ApexCorp</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- HEADER -->
+    <header class="hdr">
+      <div class="brand">
+        <div class="logo">A<span>◢</span></div>
+        <div>
+          <div class="brand-title">OMNI&nbsp;Guard <span class="ver">MVP</span></div>
+          <div class="brand-sub">ApexCorp&nbsp;S.A.C. · Seguridad para casa y negocio</div>
+        </div>
+      </div>
+      <div class="hdr-meta">
+        <span class="pill live"><span id="liveDot" class="dot off"></span><span id="liveTxt">En espera</span></span>
+        <span class="pill"><i data-ico="cpu"></i><span id="devicePill">—</span></span>
+        <span class="pill hide-sm"><i data-ico="clock"></i><span id="clock">—</span></span>
+      </div>
+    </header>
+
+    <!-- USE-CASE SELECTOR -->
+    <nav class="usecases" id="usecases">
+      <button class="uc active" data-uc="garaje">
+        <span class="uc-n">01</span>
+        <span class="uc-ico"><i data-ico="car"></i></span>
+        <span class="uc-tx"><b>Garaje / Cocheras</b><small>Ocupación y cobro por tiempo</small></span>
+      </button>
+      <button class="uc" data-uc="vigilancia">
+        <span class="uc-n">02</span>
+        <span class="uc-ico"><i data-ico="shield"></i></span>
+        <span class="uc-tx"><b>Vigilancia de zonas</b><small>Intrusión y merodeo</small></span>
+      </button>
+      <button class="uc" data-uc="rostros">
+        <span class="uc-n">03</span>
+        <span class="uc-ico"><i data-ico="face"></i></span>
+        <span class="uc-tx"><b>Captura de rostros</b><small>Registro de quién pasó</small></span>
+      </button>
+    </nav>
+
+    <!-- WORKSPACE -->
+    <div class="workspace">
+      <section class="visor">
+        <div class="steps">
+          <div class="step" data-step="1"><span class="s-n">1</span><span>Elige un video</span></div>
+          <div class="step-sep"></div>
+          <div class="step" data-step="2"><span class="s-n">2</span><span id="stepCfgTxt">Dibuja las cocheras</span></div>
+          <div class="step-sep"></div>
+          <div class="step" data-step="3"><span class="s-n">3</span><span>Procesar</span></div>
+        </div>
+
+        <div class="toolbar">
+          <div class="select-wrap"><i data-ico="film"></i>
+            <select id="videoSelect" class="sel"></select>
+          </div>
+          <div class="select-wrap conf-wrap" title="Confianza de detección">
+            <i data-ico="sliders"></i>
+            <input id="confRange" type="range" min="0.10" max="0.60" step="0.05" value="0.30" />
+            <span id="confVal" class="conf-val">0.30</span>
+          </div>
+          <button id="drawBtn" class="btn tool"><i data-ico="scan"></i><span id="drawLbl">Dibujar cochera</span></button>
+          <button id="undoBtn" class="btn tool icon-only" title="Deshacer"><i data-ico="undo"></i></button>
+          <button id="clearBtn" class="btn tool icon-only" title="Borrar zonas del módulo"><i data-ico="trash"></i></button>
+          <div class="tb-spacer"></div>
+          <button id="startBtn" class="btn primary"><i data-ico="play"></i>Procesar</button>
+          <button id="stopBtn" class="btn ghost" disabled><i data-ico="stop"></i>Detener</button>
+        </div>
+
+        <div class="viewport" id="viewport">
+          <img id="frameImg" class="layer" alt="frame" />
+          <img id="stream" class="layer" alt="stream" style="display:none" />
+          <canvas id="editor" class="layer editor"></canvas>
+          <div id="hint" class="draw-hint" style="display:none"></div>
+          <div id="placeholder" class="placeholder">
+            <i data-ico="mouse-pointer"></i>
+            <div>Elige un video y dibuja tus <b id="phCfg">cocheras</b></div>
+          </div>
+          <div class="vp-badge" id="vpBadge"><i data-ico="route"></i><span id="vpBadgeTxt">Vista previa</span></div>
+          <div id="procOverlay" class="proc-overlay" style="display:none">
+            <div class="spin"></div>
+            <span id="procTxt">Cargando modelo…</span>
+            <small>YOLO inicializando · unos segundos</small>
+          </div>
+        </div>
+        <div class="progress"><div id="progressBar"></div></div>
+
+        <div class="zonebar">
+          <span class="zb-label"><i data-ico="layers"></i>Configuración</span>
+          <span id="zoneChips"></span>
+          <span id="noZones" class="zb-empty">nada definido — usa “Dibujar”</span>
+        </div>
+      </section>
+
+      <!-- SIDE: ANALÍTICA -->
+      <aside class="analytics">
+        <div class="a-head"><span class="a-kick">✦ Analítica</span><h2 id="ucTitle">Garaje / Cocheras</h2></div>
+
+        <div class="kpis" id="kpis">
+          <div class="kpi"><span class="kpi-ico blue"><i data-ico="eye"></i></span><div><div class="kpi-v" id="kDets">0</div><div class="kpi-l">En frame ahora</div></div></div>
+          <div class="kpi"><span class="kpi-ico orange"><i data-ico="car"></i></span><div><div class="kpi-v" id="kOcupadas">0/0</div><div class="kpi-l">Cocheras ocupadas</div></div></div>
+          <div class="kpi"><span class="kpi-ico amber"><i data-ico="alert"></i></span><div><div class="kpi-v" id="kIntrusiones">0</div><div class="kpi-l">Intrusiones</div></div></div>
+          <div class="kpi"><span class="kpi-ico green"><i data-ico="face"></i></span><div><div class="kpi-v" id="kRostros">0</div><div class="kpi-l">Rostros capturados</div></div></div>
+        </div>
+
+        <!-- GARAJE -->
+        <div class="card mod-panel" data-mod="garaje">
+          <div class="card-t"><i data-ico="car"></i>Cocheras <span class="exp" id="tarifaTag">S/ 5.00 / hora</span></div>
+          <div id="cochTable" class="coch"></div>
+          <div class="ingresos-big"><b id="ingresosTotal">S/ 0.00</b><span>ingresos estimados del video</span></div>
+        </div>
+
+        <!-- VIGILANCIA -->
+        <div class="card mod-panel" data-mod="vigilancia" style="display:none">
+          <div class="card-t"><i data-ico="shield"></i>Zonas vigiladas</div>
+          <div id="vigTable" class="coch"></div>
+          <p class="note">Una persona cuenta como <b>intrusión</b> tras 1 s dentro de la zona; <b>merodeo</b> si permanece más del umbral (.env).</p>
+        </div>
+
+        <!-- ROSTROS -->
+        <div class="card mod-panel" data-mod="rostros" style="display:none">
+          <div class="card-t"><i data-ico="face"></i>Registro de rostros</div>
+          <p class="note" style="margin-top:0">Cada persona trackeada se guarda una vez (el rostro más nítido/grande visto). Archivos en <b>data/rostros/&lt;video&gt;/</b>.</p>
+          <div class="io-row">
+            <div class="io in"><span>Capturados</span><b id="rTotal">0</b></div>
+            <div class="io peak"><span>En frame</span><b id="rFrame">0</b></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-t"><i data-ico="activity"></i>Actividad durante el video</div>
+          <div class="chart-wrap"><canvas id="flowChart"></canvas></div>
+          <div class="legend"><span><i class="lg" style="background:#2D6CDF"></i>Detecciones/frame</span><span><i class="lg" style="background:#E19100"></i>Cocheras ocupadas</span><span><i class="lg" style="background:#129A6B"></i>Rostros acum.</span></div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- BOTTOM: rostros + alertas -->
+    <div class="bottom">
+      <section class="people-strip">
+        <div class="ps-head">
+          <span><i data-ico="face"></i>Galería de rostros <b id="galCount">0</b></span>
+          <span class="ps-sub"><i data-ico="route"></i>capturas del video en curso</span>
+        </div>
+        <div class="faces-grid" id="facesGrid"><div class="ps-empty">Aún no hay capturas — usa el módulo Rostros.</div></div>
+      </section>
+
+      <section class="alerts">
+        <div class="alerts-hd">
+          <div class="alerts-t"><i data-ico="alert"></i>Alertas <span id="alertCount" class="badge-n">0</span></div>
+          <button id="exportBtn" class="btn ghost sm"><i data-ico="download"></i>CSV</button>
+        </div>
+        <div class="alerts-body">
+          <table><thead><tr><th>Tiempo</th><th>Módulo</th><th>Alerta</th><th class="hide-sm">Detalle</th></tr></thead>
+          <tbody id="alertRows"></tbody></table>
+          <div id="noAlerts" class="zb-empty" style="padding:12px">Sin alertas todavía.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
