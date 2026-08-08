@@ -1,0 +1,68 @@
+[
+  {
+    "archivo": "yolo11n.pt",
+    "rol": "Personas y vehículos",
+    "umbral": 0.3,
+    "imgsz": 640,
+    "epochs": 600,
+    "dataset": "coco",
+    "licencia": "AGPL-3.0 License (https://ultralytics.com/license)",
+    "metricas": {
+      "precision": 0.6564,
+      "recall": 0.5025,
+      "mAP50": 0.5514,
+      "mAP50-95": 0.394
+    },
+    "parametros": 2624080,
+    "clases": 80,
+    "nombres": [
+      "person",
+      "bicycle",
+      "car",
+      "motorcycle",
+      "airplane",
+      "bus",
+      "train",
+      "truck"
+    ],
+    "video": "auto_estaciona.mp4",
+    "res": 640,
+    "dispositivo": "cuda",
+    "ms": 20.0,
+    "fps": 50.0,
+    "dets": 1.4,
+    "conf_media": 0.632,
+    "mejor_ms": 16.6,
+    "fuente": [
+      "Ultralytics · COCO 2017",
+      "https://docs.ultralytics.com/models/yolo11/"
+    ]
+  },
+  {
+    "archivo": "face_yolov8s.pt",
+    "rol": "Rostros, para el recorte de la entrada",
+    "umbral": 0.3,
+    "imgsz": 640,
+    "epochs": 100,
+    "dataset": "data",
+    "licencia": "AGPL-3.0 License (https://ultralytics.com/license)",
+    "metricas": {},
+    "parametros": 11135987,
+    "clases": 1,
+    "nombres": [
+      "face"
+    ],
+    "video": "peatones_arcos.mp4",
+    "res": 640,
+    "dispositivo": "cuda",
+    "ms": 25.4,
+    "fps": 39.4,
+    "dets": 12.5,
+    "conf_media": 0.706,
+    "mejor_ms": 21.4,
+    "fuente": [
+      "Detector de rostro de adetailer",
+      null
+    ]
+  }
+]
