@@ -74,14 +74,14 @@ alguien se ata un zapato.
 
 <!-- MODELOS:inicio -->
 
-### Los modelos, medidos
+### Qué tan bien detecta cada modelo
 
-| Modelo | Para qué | Entrada | Precisión | Recall | mAP@50 | mAP@50-95 |
+| Modelo | Para qué | Precisión | Recall | mAP@50 | mAP@50-95 | La cifra sale de |
 |---|---|---|---|---|---|---|
-| **`yolo11n.pt`** | Personas y vehículos | 640² | 65.6 % | 50.2 % | 55.1 % | 39.4 % |
-| **`face_yolov8s.pt`** | Rostros, para el recorte de la entrada | 640² | — | — | — | — |
+| **`yolo11n.pt`** | Personas y vehículos | 65.6 % | 50.2 % | 55.1 % | 39.4 % | el propio `.pt` |
+| **`face_yolov8s.pt`** | Rostros, para el recorte de la entrada | — | — | 71.3 % | 40.4 % | [su documentación](https://huggingface.co/Bingsu/adetailer)<br><sub>rostro realista · WIDER FACE y otros</sub> |
 
-<sub>Estas cuatro columnas **no** se calculan aquí: salen del propio archivo `.pt`, donde Ultralytics guarda la validación del entrenamiento que produjo esos pesos. Son el acierto sobre el conjunto de validación de quien lo entrenó, **no** sobre los videos de este proyecto. Medir eso exigiría etiquetar a mano esta operación concreta, que es trabajo que un MVP todavía no ha hecho; dar un porcentaje inventado sería peor que no darlo. Comprobación de que la lectura es correcta: `yolo11n` sale con mAP@50-95 = 39,4 % y Ultralytics publica 39,5 % para ese modelo en COCO.</sub>
+<sub>Ninguna de estas cifras se calcula aquí, y la última columna dice cuál es cuál. <b>El propio <code>.pt</code></b>: Ultralytics guardó dentro del archivo la validación del entrenamiento que lo produjo, así que es el acierto que midió quien lo entrenó sobre <i>su</i> conjunto. <b>Su documentación</b>: ese archivo no guardó métricas, y se cita lo que publica su autor con enlace para comprobarlo. <b>No publicado</b>: no hay cifra en ninguna parte, y se dice en vez de rellenar el hueco.<br>En los tres casos son cifras sobre el conjunto de validación de quien entrenó, <b>no</b> sobre los videos de este proyecto. Medir eso exigiría etiquetar a mano esta operación concreta, que es trabajo que un MVP todavía no ha hecho; un porcentaje inventado sería peor que ninguno. Comprobación de que la lectura del <code>.pt</code> es correcta: <code>yolo11n</code> sale con mAP@50-95 = 39,4 % y Ultralytics publica 39,5 % para ese modelo en COCO.</sub>
 
 ### De dónde sale cada modelo
 
@@ -90,14 +90,28 @@ alguien se ata un zapato.
 | **`yolo11n.pt`** | `coco` | 600 | 640×640 | [Ultralytics · COCO 2017](https://docs.ultralytics.com/models/yolo11/) |
 | **`face_yolov8s.pt`** | `data` | 100 | 640×640 | Detector de rostro de adetailer |
 
-<sub>El conjunto, las épocas y la resolución salen de `train_args`, que Ultralytics guarda dentro del propio `.pt`. Es decir: no es lo que dice la documentación del modelo, es lo que quedó grabado en el archivo que este repositorio usa de verdad. Los nombres de conjunto son los del disco de quien entrenó —`retrain_data`, `safe_human`— porque es literalmente lo que hay dentro.</sub>
+<sub>El conjunto, las épocas y la resolución salen de <code>train_args</code>, que Ultralytics guarda dentro del propio <code>.pt</code>. Es decir: no es lo que dice la ficha del modelo, es lo que quedó grabado en el archivo que este repositorio carga de verdad. Los nombres de conjunto son los del disco de quien entrenó —<code>retrain_data</code>, <code>safe_human</code>— porque es literalmente lo que hay dentro.</sub>
 
-| Modelo | Parámetros | Clases | Latencia (mejor) | Latencia (mediana) | Det./fotograma | Confianza media |
-|---|---|---|---|---|---|---|
-| **`yolo11n.pt`** | 2.6 M | 80 | 16.6 ms · 60 fps | 20.0 ms · 50.0 fps | 1.4 | 0.632 |
-| **`face_yolov8s.pt`** | 11.1 M | 1 | 21.4 ms · 47 fps | 25.4 ms · 39.4 fps | 12.5 | 0.706 |
+### Cuánto tarda cada uno, medido aquí
 
-<sub>Esto sí se mide aquí, con <a href="scripts/medir_modelos.py"><code>scripts/medir_modelos.py</code></a>, sobre fotogramas reales de los videos del repositorio, en una RTX 3060 Laptop y a la resolución que usa la aplicación. Sesenta fotogramas, descartando los veinte primeros.<br>Se dan <b>dos</b> latencias a propósito. Esta GPU está a 210 MHz en reposo y tarda segundos en subir de reloj, así que la mediana se mueve bastante entre pasadas —el mismo <code>yolo11n</code> ha dado 20 y 48 fps— mientras que el mejor caso es estable y representa lo que la máquina puede sostener. Dar solo la cifra buena sería vender de más; dar solo la mediana, castigar al modelo por la gestión de energía del portátil.</sub>
+| Modelo | Parámetros | Clases | Latencia (mejor) | Latencia (mediana) | Umbral | Det./fotograma | Confianza media |
+|---|---|---|---|---|---|---|---|
+| **`yolo11n.pt`** | 2.6 M | 80 | 17.9 ms · 56 fps | 20.5 ms · 48.7 fps | `0.30` | 1.4 | 0.632 |
+| **`face_yolov8s.pt`** | 11.1 M | 1 | 21.0 ms · 48 fps | 26.3 ms · 38.0 fps | `0.30` | 12.5 | 0.706 |
+
+<sub>Esto sí se mide aquí, con <a href="scripts/medir_modelos.py"><code>scripts/medir_modelos.py</code></a>, sobre fotogramas reales de los videos del repositorio, en una RTX 3060 Laptop y a la resolución que usa la aplicación. Sesenta fotogramas, descartando los veinte primeros. El umbral es el que usa la aplicación, y va en la tabla porque «det./fotograma» no significa nada sin él: el mismo modelo a 0.05 y a 0.50 devuelve cantidades incomparables. «Confianza media» es la media de la puntuación de lo que pasó ese umbral — no es acierto, pero dice si el modelo trabaja cómodo o al límite en este material.<br>Se dan <b>dos</b> latencias a propósito. Esta GPU está a 210 MHz en reposo y tarda segundos en subir de reloj, así que la mediana se mueve bastante entre pasadas —el mismo <code>yolo11n</code> ha dado 20 y 48 fps— mientras que el mejor caso es estable y representa lo que la máquina puede sostener. Dar solo la cifra buena sería vender de más; dar solo la mediana, castigar al modelo por la gestión de energía del portátil.</sub>
+
+### Los umbrales que usa este proyecto
+
+Una cifra de mAP sin el umbral al que se trabaja no dice nada: el mismo modelo a 0.05 y a 0.50 se comporta como dos modelos distintos. Estos son los valores por defecto, todos cambiables por variable de entorno sin tocar código.
+
+| Umbral | Valor | Por qué ese y no otro |
+|---|---|---|
+| Confianza · personas y vehículos | **`0.30`** | Más bajo que en retail: la cámara está más lejos y una persona en el fondo del garaje sale pequeña. Un falso positivo aquí cuesta poco; no detectar a alguien que entra, mucho. |
+| IoU de NMS | **`0.60`** | Funde las cajas dobles sobre el mismo coche o la misma persona. |
+| Activación de ByteTrack | **`0.25`** | Por debajo de la confianza de detección, para no perder el ID de alguien que se tapa un momento tras una columna. |
+| Confianza · rostro | **`0.30`** | Con cara mínima de ~28 px. Por debajo salen recortes que no son una cara, y eso es peor que no recortar nada. |
+| Fotogramas para confirmar un rostro | **`3`** | Un solo fotograma bueno puede ser un reflejo. Tres seguidos, no. |
 
 <!-- MODELOS:fin -->
 
