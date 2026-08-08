@@ -19,7 +19,7 @@ Comparte el **mismo Python global** de los demás MVPs — no hay nada nuevo que
 instalar.
 
 ```bash
-cd first_mvp_seguridad
+cd omni-guard
 python download_models.py          # pesos + videos de muestra
 ```
 
@@ -82,3 +82,28 @@ de tu propia cámara: cópialo a `videos/`.
 - El cobro usa el tiempo del video (para demo); en producción sería reloj real.
 - Procesa archivos de video; conectar RTSP en vivo es el paso siguiente
   (el patrón ya existe en vision-node).
+
+## Pruebas
+
+```bash
+python -m pytest -q
+```
+
+Veinte comprobaciones en cinco bloques: config y pesos, ocupación de cochera y
+**cobro por tiempo**, intrusión y merodeo sobre recorridos sintéticos, captura
+de rostros en 80 fotogramas reales, y una pasada de garaje de 300 fotogramas
+que tiene que acabar generando ingresos.
+
+Un detector que falla se ve en pantalla; una regla de merodeo mal puesta no —
+solo suena de más, o no suena nunca. Lo que falta por no venir en el
+repositorio se **salta**, no se da por bueno.
+
+## Datos personales
+
+Los recortes de rostro que produce el sistema **no se versionan**: son datos
+biométricos de personas reales que no dieron su consentimiento, y en varios
+videos salen de la calle. En Perú lo cubre la Ley 29733. El código que los
+produce sí está aquí; las caras no.
+
+<sub>OMNI Guard · ApexCorp — desarrollado por
+<a href="https://github.com/danielyatacoblas">Daniel Yataco Blas</a></sub>

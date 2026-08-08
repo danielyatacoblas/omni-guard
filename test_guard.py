@@ -14,15 +14,31 @@ if sys.stdout and hasattr(sys.stdout, "reconfigure"):
 ROOT = Path(__file__).resolve().parent
 OK = FAIL = 0
 
+# Se puede correr de dos maneras y cada una entiende el fallo de forma distinta:
+# como script (`python test_guard.py`) el resultado es el código de salida, y
+# como suite (`pytest`) tiene que ser una excepción. Imprimir «✗» y seguir deja
+# a pytest en verde con todo roto, que es peor que no tener pruebas.
+BAJO_PYTEST = "pytest" in sys.modules
+
 
 def check(name, cond, detail=""):
     global OK, FAIL
     if cond:
         OK += 1
         print(f"  ✓ {name}")
-    else:
-        FAIL += 1
-        print(f"  ✗ {name} {detail}")
+        return
+    FAIL += 1
+    print(f"  ✗ {name} {detail}")
+    if BAJO_PYTEST:
+        raise AssertionError(f"{name} {detail}".strip())
+
+
+def falta(que: str, como: str):
+    """Lo que no está por no venir en el repositorio no es un fallo: se salta."""
+    if BAJO_PYTEST:
+        import pytest
+        pytest.skip(f"falta {que} — {como}")
+    check(f"{que} existe", False, f"— {como}")
 
 
 def _dets(boxes, tids):
@@ -39,8 +55,10 @@ def test_config():
     print("\n[1] Config y pesos")
     from backend.config import config
     check("config carga", config.port == 8030)
-    check("yolo11n existe", (ROOT / config.yolo_model).exists())
-    check("face model existe", (ROOT / config.face_model).exists())
+    for peso in (config.yolo_model, config.face_model):
+        if not (ROOT / peso).exists():
+            return falta(peso, "corre download_models.py")
+    check("pesos presentes", True)
 
 
 def test_cochera():
@@ -89,8 +107,7 @@ def test_rostros_video():
     print("\n[4] Rostros en video real (80 frames, peatones_arcos)")
     vid = ROOT / "videos" / "peatones_arcos.mp4"
     if not vid.exists():
-        check("video demo existe", False, "— corre download_models.py")
-        return
+        return falta("videos/peatones_arcos.mp4", "corre download_models.py")
     import shutil
     from backend.config import config
     from backend.processor import VideoProcessor
@@ -114,8 +131,8 @@ def test_garaje_video():
     vid = ROOT / "videos" / "auto_estaciona.mp4"
     zjson = ROOT / "data" / "zones" / "auto_estaciona.mp4.json"
     if not (vid.exists() and zjson.exists()):
-        check("video+zona existen", False)
-        return
+        return falta("videos/auto_estaciona.mp4 y su zona",
+                     "corre download_models.py")
     from backend.processor import VideoProcessor
     p = VideoProcessor()
     p.detector_kind = "vehiculos"
