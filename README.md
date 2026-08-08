@@ -7,7 +7,9 @@
 > ![pruebas](https://img.shields.io/badge/pruebas-20%20comprobaciones-129A6B)
 > ![licencia](https://img.shields.io/badge/uso-interno%20ApexCorp-E19100)
 
-![OMNI Guard en marcha](docs/capturas/01-garaje.png)
+<p align="center">
+  <img src="docs/portada.svg" alt="OMNI Guard: de una cámara que solo graba a una que avisa" width="100%">
+</p>
 
 ## El problema
 
